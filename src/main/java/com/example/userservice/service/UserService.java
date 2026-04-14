@@ -2,6 +2,7 @@ package com.example.userservice.service;
 
 import com.example.userservice.client.PointClient;
 import com.example.userservice.domain.User;
+import com.example.userservice.dto.AddActivityScoreRequestDto;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.domain.UserRepository;
 import com.example.userservice.dto.UserResponseDto;
@@ -51,5 +52,16 @@ public class UserService {
 
         return users.stream().map(user -> new UserResponseDto(user.getUserId(), user.getEmail(), user.getName()))
                 .collect(Collectors.toList());
+    }
+
+    // 활동 점수 적립
+    @Transactional
+    public void addActivityScore(AddActivityScoreRequestDto addActivityScoreRequestDto) {
+        User user = userRepository.findById(addActivityScoreRequestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.addActivityScore(addActivityScoreRequestDto.getScore());
+
+        userRepository.save(user);
     }
 }
