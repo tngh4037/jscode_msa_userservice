@@ -11,6 +11,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # kafka 로 부터 받아온 메시지(key)를 String 으로 역직렬화
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer # kafka 로 부터 받아온 메시지(value)를 String 으로 역직렬화
 
 client:
   point-service:
