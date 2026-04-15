@@ -6,6 +6,10 @@ import com.example.userservice.dto.AddActivityScoreRequestDto;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.domain.UserRepository;
 import com.example.userservice.dto.UserResponseDto;
+import com.example.userservice.event.UserSignedUpEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +23,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PointClient pointClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public UserService(UserRepository userRepository, PointClient pointClient) {
+    public UserService(UserRepository userRepository, PointClient pointClient,
+                       KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.pointClient = pointClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Transactional
@@ -33,8 +40,27 @@ public class UserService {
                 signUpRequestDto.getPassword()
         );
 
-        User savedUser = this.userRepository.save(user); // 회원가입
-        this.pointClient.addPoints(savedUser.getUserId(), SIGN_UP_POINT_AMOUNT); // 포인트 적립
+        // 회원가입
+        User savedUser = this.userRepository.save(user);
+
+        // 포인트 적립
+        this.pointClient.addPoints(savedUser.getUserId(), SIGN_UP_POINT_AMOUNT);
+
+        // 회원가입 완료 이벤트 발행
+        UserSignedUpEvent userSignedUpEvent = new UserSignedUpEvent(
+                savedUser.getUserId(),
+                savedUser.getName()
+        );
+        this.kafkaTemplate.send("user.signed-up", toJsonString(userSignedUpEvent));
+    }
+    
+    private String toJsonString(Object object) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 직렬화 실패", e);
+        }
     }
 
     public UserResponseDto getUser(Long userId) {

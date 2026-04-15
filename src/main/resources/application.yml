@@ -16,6 +16,9 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # kafka 로 부터 받아온 메시지(key)를 String 으로 역직렬화
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer # kafka 로 부터 받아온 메시지(value)를 String 으로 역직렬화
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 client:
   point-service:
