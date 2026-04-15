@@ -63,5 +63,8 @@ public class UserService {
         user.addActivityScore(addActivityScoreRequestDto.getScore());
 
         userRepository.save(user);
+
+        // 의도적 에러 발생 코드
+        // throw new RuntimeException("에러 발생");
     }
 }
