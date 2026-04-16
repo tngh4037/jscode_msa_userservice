@@ -1,5 +1,7 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.LoginRequestDto;
+import com.example.userservice.dto.LoginResponseDto;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +26,13 @@ public class UserController {
     ) {
         userService.signUp(signUpRequestDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(
+            @RequestBody LoginRequestDto loginRequestDto
+    ) {
+        LoginResponseDto loginResponseDto = userService.login(loginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 }
