@@ -25,4 +25,4 @@ client:
     url: http://localhost:8082
 
 jwt:
-  secret: jsocde-secret-1234-1234-1234-1234
+  secret: jscode-secret-1234-1234-1234-1234
